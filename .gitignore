@@ -1,3 +1,6 @@
+# Folder view config files
+.DS_Store
+Desktop.ini
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -127,3 +130,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# VSCode extensions
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
