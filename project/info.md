@@ -1,5 +1,5 @@
 # Project Information
-#### Please add any reserach you've found about the topics in the project here! 😊 
+#### Please add any research you've found about the topics in the project here! 😊 
 
 ## Implicit Midpoint Method
 
