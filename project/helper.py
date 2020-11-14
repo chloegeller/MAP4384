@@ -35,12 +35,12 @@ def implicitMidpoint(t, to, xo, xp0, stepsize, a, o):
     y = [xo]
     steps = int((t - to)/stepsize)
     for i in range(0, steps):
-        k = f(to + i*steps, y[i], a, o)
-        y.append(y[i] + f(to+.5*stepsize, y+.5*stepsize*k, a, o)*stepsize)
+        k = f(to + i*stepsize, y[i], a, o)
+        y.append(y[i] + f(to+.5*stepsize, y[i]+.5*stepsize*k, a, o)*stepsize)
     print(y[-1])
     return
 if __name__ == "__main__":
-    ##midPoint(5, 0, 1, 1, .0000001, 1, 2)
-    ##b = np.sqrt(4- 1)
-    ##print(x(5, 1, b, 1))
-    implicitMidpoint(5, 0, 1, 1, .0000001, 1, 2)
+    midPoint(5, 0, 1, 1, .0000001, 0, 2)
+    b = np.sqrt(4)
+    print(x(5, 0, b, 1))
+    implicitMidpoint(5, 0, 1, 1, .0000001, 0, 2)
