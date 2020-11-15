@@ -50,7 +50,7 @@ def relativeError(exact, aprox, steps):
 
 if __name__ == "__main__":
     # IV = (t0, x0, xp0, steps, g, o)
-    IV =(0, 1, 1, 1000, .1, .2)
+    IV =(0, 1, 1, 100, .1, .2)
     tm, ym = midPoint(3, IV)
     ti, yi = implicitMidpoint(3, IV)
     tx, yx = exact(3,IV)
