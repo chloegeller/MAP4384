@@ -19,7 +19,8 @@ def midPoint(t, IV):
     h = (t - t0)/steps
     y = np.zeros(steps+1)
     t = np.arange(t0, t+h, h)
-    y[0] = eulers(t0, x0, xp0, g, o, h)
+    y[0] = x0
+    y[1] = eulers(t0, x0, x0*g, g, o, h)
     for i in range(1, steps):
         y[i+1] = y[i-1] + 2*f(t[i], y[i], g, o)*h
     return t, y
@@ -28,10 +29,18 @@ def implicitMidpoint(t, IV):
     h = (t - t0)/steps
     y = np.zeros(steps+1)
     t = np.arange(t0, t+h, h)
-    y[0] = xp0
-    for i in range(1, (steps+1)):
-        k = f(t[i-1], y[i-1], g, o)
-        y[i] = y[i-1] + f(t[i-1]+.5*h, y[i-1]+.5*h*k, g, o)*h
+    y[0] = x0
+    for i in range(0, (steps)):
+        y[i+1] = (y[i]*(1-g*h)- o*o*(t[i+1]+t[i])/2)/(1+h*g)
+    return t, y
+def nsImpMidpoint(t, IV):
+    t0, x0, xp0, steps, g, o = IV
+    h = (t - t0)/steps
+    y = np.zeros(steps+1)
+    t = np.arange(t0, t+h, h)
+    y[0] = x0
+    for i in range(0, (steps)):
+        y[i+1] = y[i]*np.exp(-g*h) - h*(o*o)*(t[i+1] + np.exp(-g*h)*t[i])*.5
     return t, y
 def exact(t, IV):
     t0, x0, xp0, steps, g, o = IV
@@ -47,14 +56,15 @@ def relativeError(exact, aprox, steps):
     for i in range(0, steps+1):
         rel[i] = abs(exact[i]-aprox[i])/abs(exact[i])
     return rel
-
 if __name__ == "__main__":
     # IV = (t0, x0, xp0, steps, g, o)
-    IV =(0, 1, 1, 100, .1, .2)
-    tm, ym = midPoint(3, IV)
-    ti, yi = implicitMidpoint(3, IV)
-    tx, yx = exact(3,IV)
+    IV =(0, 1, .0001, 10, .0001, 1)
+    tm, ym = midPoint(1, IV)
+    ti, yi = implicitMidpoint(1, IV)
+    tx, yx = exact(1,IV)
+    tn, yn = nsImpMidpoint(1, IV)
     rel = relativeError(yx, yi, 10)
-    plt.plot(tm, ym, 'r', ti, yi, 'g', tx, yx, 'b')
+    #plt.plot(tm, ym, 'r', ti, yi, 'g', tx, yx, 'b')
+    plt.plot(tm, ym, 'r', tx, yx, 'g')
     #plt.plot(tx, rel)
     plt.show()
