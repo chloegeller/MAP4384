@@ -3,7 +3,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import fsolve as fs
 
-
+#####################################
+ #                                 #
+ #        Explicit Midpoint        #
+ #                                 #
+#####################################
 
 def midPoint(t, IV):
     y = np.zeros(steps+1)
@@ -20,6 +24,12 @@ def midPoint(t, IV):
             xl[i+1] = xl[i-1] + 2*h*y[i]
             y[i+1] = y[i-1] - 4*gamma*h*y[i] - 2*omega**2*h*xl[i]
     return t, xl
+
+#####################################
+ #                                 #
+ #        Implicit Midpoint        #
+ #                                 #
+#####################################
 
 def IMP(p):
     X, Y = p
@@ -44,6 +54,40 @@ def implicitMidpoint():
     
     return time, traj
 
+#####################################
+ #                                 #
+ #  Non-standard Implicit Midpoint #
+ #                                 #
+#####################################
+
+def NSIMP(p):
+    X, Y = p
+    deriv = np.array([0.,0.])
+    deriv[0]= (Y+np.exp(-gamma*h)*xn[1])/2 - (X-np.exp(-gamma*h)*xn[0])/h
+    deriv[1]= - omega**2*(X+np.exp(-gamma*h)*xn[0])/2 - (Y-np.exp(-gamma*h)*xn[1])/h
+    return deriv
+
+def nsImplicitMid():
+    
+    time=np.zeros(1)
+    global xn
+    xn = np.array([x0, xp0])
+    traj=xn
+
+    for i in range(1, steps+1):
+        t=i*h
+        time=np.hstack([time,t])
+        x_new = fs(NSIMP,xn) 
+        traj=np.vstack([traj,x_new])
+        xn=x_new
+    
+    return time, traj
+
+#####################################
+ #                                 #
+ #          Exact solution         #
+ #                                 #
+#####################################
 
 def exact(t, IV):
     t0, x0, steps, g, o = IV
@@ -82,9 +126,12 @@ if __name__ == "__main__":
     IV = (t0, x0, steps, gamma, omega)
     #IV =(0, 1, 100, .0001, 1)
     #tm, ym = midPoint(1, IV)
-    ti, xi = implicitMidpoint()
-    print(ti)
-    print(xi)
+    #ti, xi = implicitMidpoint()
+    #print(ti)
+    #print(xi)
+    tn, xn = nsImplicitMid()
+    print(tn)
+    print(xn)
     tx, yx = exact(1,IV)
     print(yx)
     #plt.plot(tm, ym, 'r', ti, yi, 'g', tx, yx, 'b')

@@ -9,10 +9,10 @@ from tabulate import tabulate
 from scipy.optimize import fsolve as fs
 
  # Initial parameters
-a, b = 0, 10
-omega = 5.0
-gamma = 0.3
-x0 = 100.0
+a, b = 0, 1
+omega = 1.0
+gamma = 0.1
+x0 = 1.0
 h=0.1
 x=np.array([x0,gamma*x0])
 traj=x
@@ -37,7 +37,7 @@ x_sol = func(t_sol)
 # Appr solution
 time=np.zeros(1)
 
-for i in range(t_sol.size):
+for i in range(1,t_sol.size):
     t=i*h
     time=np.hstack([time,t])
     x_new = fs(IMP,x) 
