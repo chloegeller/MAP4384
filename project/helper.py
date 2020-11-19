@@ -1,53 +1,49 @@
 ## notes
-## yp is previous (n-1)
-## h is step size
-## g is gamma
-## o is omega
 import numpy as np
-import math
 import matplotlib.pyplot as plt
+from scipy.optimize import fsolve as fs
 
-## actual solution
-def x(t, g, b, x0):
-    return x0*np.exp(-g*t)*np.cos(b*t)
+
 
 def midPoint(t, IV):
-    t0, x0, steps, g, o = IV
-    h = (t - t0)/steps
     y = np.zeros(steps+1)
-    x = np.zeros(steps+1)
+    xl = np.zeros(steps+1)
     t = np.arange(t0, t+h, h)
-    xp0 = x0*g
-    x[0] = x0
+    xp0 = x0*gamma
+    xl[0] = x0
     y[0] = xp0
     for i in range(0, steps):
         if i == 0:
-            x[i+1] = 2*h*y[i]
-            y[i+1] = -4*g*h*y[i] - 2*o*o*h*x[i]
+            xl[i+1] = 2*h*y[i]
+            y[i+1] = -4*gamma*h*y[i] - 2*omega**2*h*xl[i]
         else:
-            x[i+1] = x[i-1] + 2*h*y[i]
-            y[i+1] = y[i-1] - 4*g*h*y[i] - 2*o*o*h*x[i]
-    return t, x
+            xl[i+1] = xl[i-1] + 2*h*y[i]
+            y[i+1] = y[i-1] - 4*gamma*h*y[i] - 2*omega**2*h*xl[i]
+    return t, xl
 
-def implicitMidpoint(t, IV):
-    t0, x0, xp0, steps, g, o = IV
-    h = (t - t0)/steps
-    y = np.zeros(steps+1)
-    t = np.arange(t0, t+h, h)
-    y[0] = x0
-    for i in range(0, (steps)):
-        y[i+1] = (y[i]*(1-g*h)- o*o*(t[i+1]+t[i])/2)/(1+h*g)
-    return t, y
+def IMP(p):
+    X, Y = p
+    deriv = np.array([0.,0.])
+    deriv[0]= (Y+x[1])/2 - (X-x[0])/h
+    deriv[1]= -2*gamma*(Y+x[1])/2 - omega**2*(X+x[0])/2 - (Y-x[1])/h
+    return deriv
 
-def nsImpMidpoint(t, IV):
-    t0, x0, xp0, steps, g, o = IV
-    h = (t - t0)/steps
-    y = np.zeros(steps+1)
-    t = np.arange(t0, t+h, h)
-    y[0] = x0
-    for i in range(0, (steps)):
-        y[i+1] = y[i]*np.exp(-g*h) - h*(o*o)*(t[i+1] + np.exp(-g*h)*t[i])*.5
-    return t, y
+def implicitMidpoint():
+    
+    time=np.zeros(1)
+    global x
+    x = np.array([x0, xp0])
+    traj=x
+
+    for i in range(1, steps+1):
+        t=i*h
+        time=np.hstack([time,t])
+        x_new = fs(IMP,x) 
+        traj=np.vstack([traj,x_new])
+        x=x_new
+    
+    return time, traj
+
 
 def exact(t, IV):
     t0, x0, steps, g, o = IV
@@ -66,14 +62,32 @@ def relativeError(exact, aprox, steps):
     return rel
 
 if __name__ == "__main__":
-    # IV = (t0, x0, steps, g, o)
-    IV =(0, 1, 100, .0001, 1)
-    tm, ym = midPoint(1, IV)
-    #ti, yi = implicitMidpoint(1, IV)
+    global t0
+    t0 = 0
+    global t
+    t = 1
+    global x0
+    x0 = 1
+    global steps
+    steps = 10
+    global h
+    h = (t -t0)/steps
+    global gamma
+    gamma = .1
+    global omega
+    omega = 1
+    global xp0
+    xp0 = x0*gamma
+
+    IV = (t0, x0, steps, gamma, omega)
+    #IV =(0, 1, 100, .0001, 1)
+    #tm, ym = midPoint(1, IV)
+    ti, xi = implicitMidpoint()
+    print(ti)
+    print(xi)
     tx, yx = exact(1,IV)
-    #tn, yn = nsImpMidpoint(1, IV)
-   # rel = relativeError(yx, yi, 10)
+    print(yx)
     #plt.plot(tm, ym, 'r', ti, yi, 'g', tx, yx, 'b')
-    plt.plot(tm, ym, 'r', tx, yx, 'g')
+    #plt.plot(ti, xi, 'r', tx, yx, 'g')
     #plt.plot(tx, rel)
     plt.show()
