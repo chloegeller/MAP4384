@@ -104,7 +104,8 @@ def run_test():
     error_exact = relative_error(x_ex, x_ex, steps)
     
     fig, axs = plt.subplots(2)
-    
+    fig.set_figheight(10)
+    fig.set_figwidth(10)
     title1 = "Exact solution and methods: gamma=" + str(gamma) + ", omega=" + str(omega) + ", h=" + str(h)
     axs[0].plot(t, x_ex, "limegreen", label="Exact Solution", linewidth=5.5)
     axs[0].plot(t, x_m, "cornflowerblue", label="EMP")
@@ -113,7 +114,6 @@ def run_test():
     axs[0].set(xlabel = "time", ylabel = "x(t)")
     axs[0].set_title(title1)
     axs[0].legend(loc="upper right", fontsize="small")
-    plt.show()
     
     title2 = "Errors: gamma=" + str(gamma) + ", omega=" + str(omega) + ", h=" + str(h)
     axs[1].plot(t, error_exact, "limegreen", label="Exact Error", linewidth=5.5)
