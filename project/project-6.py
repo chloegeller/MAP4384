@@ -6,8 +6,6 @@ import matplotlib.pyplot as plt
 from scipy.optimize import fsolve as fs
 from tabulate import tabulate as table
 
-global x0, steps, gamma, omega
-
 def mid_point():    
     y = np.zeros(steps+1)
     xl = np.zeros(steps+1)
@@ -86,7 +84,7 @@ def relative_error(exact, approx, steps):
 def results(t, x_m, x_i, x_n, err1, err2, err3, x_ex):
     return list(zip(range(t.shape[0]), t, x_m, x_i, x_n, err1, err2, err3, x_ex))
 
-def main():
+def run_test():
     global t0, h, xp0, t
 
     t0 = 0
@@ -105,30 +103,26 @@ def main():
     error_nsimp = relative_error(x_ex, x_n[:,0], steps)
     error_exact = relative_error(x_ex, x_ex, steps)
     
+    fig, axs = plt.subplots(2)
+    
     title1 = "Exact solution and methods: gamma=" + str(gamma) + ", omega=" + str(omega) + ", h=" + str(h)
-    plt.figure(figsize=(8, 6))
-    plt.plot(t, x_ex, "limegreen", label="Exact Solution", linewidth=5.5)
-    plt.plot(t, x_m, "cornflowerblue", label="EMP")
-    plt.plot(t, x_i[:,0], "blueviolet", marker="o", label="IMP")
-    plt.plot(t, x_n[:,0], "darkorange", label="NSIMP")
-    plt.xlabel("time")
-    plt.ylabel("x(t)")
-    plt.title(title1)
-    plt.legend(loc="upper right", fontsize="small")
-    plt.savefig("./plots/"+title1+".png")
+    axs[0].plot(t, x_ex, "limegreen", label="Exact Solution", linewidth=5.5)
+    axs[0].plot(t, x_m, "cornflowerblue", label="EMP")
+    axs[0].plot(t, x_i[:,0], "blueviolet", marker="o", label="IMP")
+    axs[0].plot(t, x_n[:,0], "darkorange", label="NSIMP")
+    axs[0].set(xlabel = "time", ylabel = "x(t)")
+    axs[0].set_title(title1)
+    axs[0].legend(loc="upper right", fontsize="small")
     plt.show()
     
     title2 = "Errors: gamma=" + str(gamma) + ", omega=" + str(omega) + ", h=" + str(h)
-    plt.figure(figsize=(8,6))
-    plt.plot(t, error_exact, "limegreen", label="Exact Error", linewidth=5.5)
-    plt.plot(t, error_mid, "cornflowerblue", label="EMP Error")
-    plt.plot(t, error_imp, "blueviolet", marker="o", label="IMP Error")
-    plt.plot(t, error_nsimp, "darkorange", label="NSIMP Error")
-    plt.xlabel("time")
-    plt.ylabel("x(t)")
-    plt.title(title2)
-    plt.legend(loc="upper right", fontsize="small")
-    plt.savefig("./plots/"+title2+".png")
+    axs[1].plot(t, error_exact, "limegreen", label="Exact Error", linewidth=5.5)
+    axs[1].plot(t, error_mid, "cornflowerblue", label="EMP Error")
+    axs[1].plot(t, error_imp, "blueviolet", marker="o", label="IMP Error")
+    axs[1].plot(t, error_nsimp, "darkorange", label="NSIMP Error")
+    axs[1].set(xlabel = "time", ylabel = "Relative Error")
+    axs[1].set_title(title2)
+    axs[1].legend(loc="upper right", fontsize="small")
     plt.show()
     
 
@@ -169,208 +163,209 @@ def gamma_0():
     plt.ylabel("x(t)")
     plt.title(title1)
     plt.legend(loc="lower left", fontsize="small")
-    plt.savefig("./plots/"+title1+".png")
     plt.show()
 
     return
 
-# "MAIN" FUNCTION should start here
-# ================================ Initial Values ================================
-steps = 10
-x0 = 1
-gamma = 0.1
-omega = 1
-main()
-# ================================================================================
+if __name__ == "__main__":
+    global x0, steps, gamma, omega
+    
+    # ================================ Initial Values ================================
+    steps = 10
+    x0 = 1
+    gamma = 0.1
+    omega = 1
+    run_test()
+    # ================================================================================
 
-# ============================== Computational Cost ==============================
-s = [10, 25, 50, 100]
-g = [10e-4, 10e-3, 10e-2, 10e-1]
-o = [1, 2, 5, 10]
-times = []
+    # ============================== Computational Cost ==============================
+    s = [10, 25, 50, 100]
+    g = [10e-4, 10e-3, 10e-2, 10e-1]
+    o = [1, 2, 5, 10]
+    times = []
 
-for steps in s:
-    for gamma in g:
-        for omega in o:
-            temp = []
-            temp.append(steps)
-            temp.append(gamma)
-            temp.append(omega)
-            start = time.time()
-            mid_point()
-            temp.append(time.time() - start)
-            start = time.time()
-            implicit_mid_point()
-            temp.append(time.time() - start)
-            start = time.time()
-            ns_implicit_mid()
-            temp.append(time.time() - start)
-            times.append(temp)
-            
-print(table(times, headers=["steps", "gamma", "omega", "EMP Time", "IMP Time", "NSIMP Time"]))
-# ================================================================================
+    for steps in s:
+        for gamma in g:
+            for omega in o:
+                temp = []
+                temp.append(steps)
+                temp.append(gamma)
+                temp.append(omega)
+                start = time.time()
+                mid_point()
+                temp.append(time.time() - start)
+                start = time.time()
+                implicit_mid_point()
+                temp.append(time.time() - start)
+                start = time.time()
+                ns_implicit_mid()
+                temp.append(time.time() - start)
+                times.append(temp)
 
-# ======================== Implicit Methods when gamma = 0 =======================
-steps = 10
-x0 = 1
-gamma = 0
-omega = 1
+    print(table(times, headers=["steps", "gamma", "omega", "EMP Time", "IMP Time", "NSIMP Time"]))
+    # ================================================================================
 
-# Generates the plots used in the report
-gamma_0()
+    # ======================== Implicit Methods when gamma = 0 =======================
+    steps = 10
+    x0 = 1
+    gamma = 0
+    omega = 1
 
-# To generate the tables used in the presention use main(), we did not use the plots from main() for this section
-# main()
+    # Generates the plots used in the report
+    gamma_0()
 
-# Uncomment the lines below to generate the tables used in the report
-# steps = 100
-# main()
+    # To generate the tables used in the presention use run_test(), we did not use the plots from run_test() for this section
+    # run_test()
 
-# steps = 1000
-# main()
+    # Uncomment the lines below to generate the tables used in the report
+    # steps = 100
+    # run_test()
 
-steps = 10
-x0 = 1
-gamma = 0
-omega = 5
+    # steps = 1000
+    # run_test()
 
-# Generates the plots used in the report
-gamma_0()
+    steps = 10
+    x0 = 1
+    gamma = 0
+    omega = 5
 
-# To generate the tables used in the presention use main(), we did not use the plots from main() for this section
-# main()
+    # Generates the plots used in the report
+    gamma_0()
 
-# Uncomment the lines below to generate the tables used in the report
-# steps = 100
-# main()
+    # To generate the tables used in the presention use run_test(), we did not use the plots from run_test() for this section
+    # run_test()
 
-# steps = 1000
-# main()
+    # Uncomment the lines below to generate the tables used in the report
+    # steps = 100
+    # run_test()
 
-steps = 10
-x0 = 3
-gamma = 0
-omega = 6
+    # steps = 1000
+    # run_test()
 
-# Generates the plots used in the report
-gamma_0()
+    steps = 10
+    x0 = 3
+    gamma = 0
+    omega = 6
 
-# To generate the tables used in the presention use main(), we did not use the plots from main() for this section
-# main()
+    # Generates the plots used in the report
+    gamma_0()
 
-# Uncomment the lines below to generate the tables used in the report
-# steps = 100
-# main()
+    # To generate the tables used in the presention use run_test(), we did not use the plots from run_test() for this section
+    # run_test()
 
-# steps = 1000
-# main()
-# ================================================================================
+    # Uncomment the lines below to generate the tables used in the report
+    # steps = 100
+    # run_test()
 
-# =============== Long-time accuracy for small values of gamma > 0 ===============
-steps = 100
-x0 = 1
-gamma = 1e-14
-omega = 1
-main()
+    # steps = 1000
+    # run_test()
+    # ================================================================================
 
-# Uncomment the lines below to generate the tables used in the report
-# steps = 10
-# main()
+    # =============== Long-time accuracy for small values of gamma > 0 ===============
+    steps = 100
+    x0 = 1
+    gamma = 1e-14
+    omega = 1
+    run_test()
 
-# steps = 1000
-# main()
+    # Uncomment the lines below to generate the tables used in the report
+    # steps = 10
+    # run_test()
 
-steps = 100
-x0 = 1
-gamma = 1e-5
-omega = 1
-main()
+    # steps = 1000
+    # run_test()
 
-# Uncomment the lines below to generate the tables used in the report
-# steps = 10
-# main()
+    steps = 100
+    x0 = 1
+    gamma = 1e-5
+    omega = 1
+    run_test()
 
-# steps = 1000
-# main()
+    # Uncomment the lines below to generate the tables used in the report
+    # steps = 10
+    # run_test()
 
-steps = 100
-x0 = 1
-gamma = 1e-14
-omega = 5
-main()
+    # steps = 1000
+    # run_test()
 
-# Uncomment the lines below to generate the tables used in the report
-# steps = 10
-# main()
+    steps = 100
+    x0 = 1
+    gamma = 1e-14
+    omega = 5
+    run_test()
 
-# steps = 1000
-# main()
+    # Uncomment the lines below to generate the tables used in the report
+    # steps = 10
+    # run_test()
 
-steps = 100
-x0 = 1
-gamma = 1e-14
-omega = 50
-main()
+    # steps = 1000
+    # run_test()
 
-# Uncomment the lines below to generate the tables used in the report
-# steps = 10
-# main()
+    steps = 100
+    x0 = 1
+    gamma = 1e-14
+    omega = 50
+    run_test()
 
-# steps = 1000
-# main()
+    # Uncomment the lines below to generate the tables used in the report
+    # steps = 10
+    # run_test()
+
+    # steps = 1000
+    # run_test()
 
 
-steps = 100
-x0 = 1
-gamma = 0.5
-omega = 1
-main()
+    steps = 100
+    x0 = 1
+    gamma = 0.5
+    omega = 1
+    run_test()
 
-# Uncomment the lines below to generate the tables used in the report
-# steps = 10
-# main()
+    # Uncomment the lines below to generate the tables used in the report
+    # steps = 10
+    # run_test()
 
-# steps = 1000
-# main()
+    # steps = 1000
+    # run_test()
 
-steps = 100
-x0 = 1
-gamma = 0.9
-omega = 1
-main()
+    steps = 100
+    x0 = 1
+    gamma = 0.9
+    omega = 1
+    run_test()
 
-# Uncomment the lines below to generate the tables used in the report
-# steps = 10
-# main()
+    # Uncomment the lines below to generate the tables used in the report
+    # steps = 10
+    # run_test()
 
-# steps = 1000
-# main()
-# ================================================================================
+    # steps = 1000
+    # run_test()
+    # ================================================================================
 
-# =============================== Breaking Points ================================
-## ODD
-steps = 25
-x0 = 1
-gamma = 0.1
-omega = 1
-main()
+    # =============================== Breaking Points ================================
+    ## ODD
+    steps = 25
+    x0 = 1
+    gamma = 0.1
+    omega = 1
+    run_test()
 
-## EVEN
-steps = 26
-x0 = 1
-gamma = 0.1
-omega = 1
-main()
+    ## EVEN
+    steps = 26
+    x0 = 1
+    gamma = 0.1
+    omega = 1
+    run_test()
 
-steps = 20
-x0 = 1
-gamma = 0.1
-omega = 3.14/2
-main()
+    steps = 20
+    x0 = 1
+    gamma = 0.1
+    omega = 3.14/2
+    run_test()
 
-# Error diverging and converging
-steps = 100
-x0 = 1
-gamma = 0.1
-omega = 12.56
-main()
+    # Error diverging and converging
+    steps = 100
+    x0 = 1
+    gamma = 0.1
+    omega = 12.56
+    run_test()
