@@ -127,10 +127,9 @@ def run_test():
     error_exact = relative_error(x_ex, x_ex, steps)
 
     fig, axs = plt.subplots(2)
-    fig.suptitle('Vertically stacked subplots')
     
     title1 = "Exact solution and methods: gamma=" + str(gamma) + ", omega=" + str(omega) + ", h=" + str(h)
-    #fig.figure(figsize=(8, 6))
+    
     axs[0].plot(t, x_ex, "limegreen", label="Exact Solution", linewidth=5.5)
     axs[0].plot(t, x_m, "cornflowerblue", label="EMP")
     axs[0].plot(t, x_i[:,0], "blueviolet", marker="o", label="IMP")
@@ -149,7 +148,6 @@ def run_test():
     axs[1].set(xlabel = "time", ylabel = "Relative Error")
     axs[1].set_title(title2)
     axs[1].legend(loc="upper right", fontsize="small")
-    #axs[1].savefig("./plots/"+title2+".png")
     plt.show()
     
 
